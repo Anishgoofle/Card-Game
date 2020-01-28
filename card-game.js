@@ -418,19 +418,24 @@ players satisfying the condition is greater than 1
 function checkTieWinner(tiePlayers, condition) {
     let playerArr1 = [];
     let max = 0;
+    let pairValue = [];
+    var map = new Map();
     switch (condition) {
         case 'allEqual':
             playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
             max = Math.max(...playerArr1);
-            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
+            return tiePlayers[playerArr1.indexOf(max)].name;
         case 'sequence':
             playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
             max = Math.max(...playerArr1);
-            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
+            return tiePlayers[playerArr1.indexOf(max)].name;
         case 'pair':
-            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
+            pairValue = tiePlayers.map(player => players[player.i].hand);
+            pairValue.forEach(val => val.forEach(el => map.set(el.weight, (map.get(el.weight) || 0) + 1)));
+            pairValue = pairValue.map(val => val.filter(el => map.get(el.weight) > 1));
+            playerArr1 = pairValue.map(val => val.reduce((a, b) => a + b.weight, 0));
             max = Math.max(...playerArr1);
-            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
+            return tiePlayers[playerArr1.indexOf(max)].name;
         default:
             break;
     }
