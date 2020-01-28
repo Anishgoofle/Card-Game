@@ -163,4 +163,54 @@ function check() {
 }
 
 
+/*
+ detectWinner()
+ -This function takes the reduced array and sort the array(hand)
+  containing the cards based on their rank values ('weights' key in array) in descending
+  order.
+-The sorted array is then passed through the following conditions:-
+ -First victory condition - 'checkEqual()' - to check all cards are same (ex - 3A's for a player having three cards)
+ -Second victory condition - 'checkSequence()' - to check if card are in sequence ..(ex 4, 5, 6)
+ -Third victory condition - 'checkPair()' - to check if the cards contain a pair.. (ex 2'K' or 2'A')
+ -Fourth victory conditon - 'checkTopCard()' - if above all 3 conditions fail, then the winnner is determined
+   by taking the top card (by rank(weight)) and checking which player has the highest card by rank value.
+   ***In case of  a tie, the tied players are then allowed to pick a new card from the deck until a winner is found***
+*/
+
+function detectWinner(item) {
+    //Sort each value rankwise
+    item.map(val => val.hand.sort((a, b) => (a.weight < b.weight) ? 1 : (b.weight < a.weight) ? -1 : 0));
+    let vCondition1 = checkEqual(item);
+    if (vCondition1 !== undefined) {
+        winner = vCondition1;
+        console.log(`Winner is ${winner} --> All Cards Same`);
+        return;
+    }
+    if (!winner) {
+        let vCondition2 = checkSequence(item);
+        if (vCondition2 !== undefined) {
+            winner = vCondition2;
+            console.log(`Winner is ${winner} --> Card Sequence In Order`);
+            return;
+        }
+    }
+    if (!winner) {
+        let vCondition3 = checkPair(item);
+        if (vCondition3 !== undefined) {
+            winner = vCondition3;
+            console.log(`Winner is ${winner} --> Pair Check`);
+            return;
+        }
+    }
+    if (!winner) {
+        let vCondition4 = checkTopCard(item);
+        if (vCondition4 !== undefined) {
+            winner = ` Player ${vCondition4 + 1}`;
+            console.log(`Winner is ${winner} --> All Cases Failed, Won By Topcard Rank Value`);
+            return;
+        }
+    }
+}
+
+
 
