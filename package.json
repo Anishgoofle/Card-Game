@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Anishgoofle/Card-Game/issues"
   },
-  "homepage": "https://github.com/Anishgoofle/Card-Game#readme"
+  "homepage": "https://github.com/Anishgoofle/Card-Game#readme",
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
 }
