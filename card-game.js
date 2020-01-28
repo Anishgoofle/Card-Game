@@ -406,4 +406,27 @@ function dealTie(arr) {
     }
 }
 
+/*
+This function is triggered when any of the first 3 
+victory conditions are satisfied but the number of 
+players satisfying the condition is greater than 1
+*/
+function checkTieWinner(tiePlayers, condition) {
+    switch (condition) {
+        case 'allEqual':
+            let playerArr1 = [];
+            break;
+        case 'sequence':
+            let playerArr2 = [];
+            break;
+        case 'pair':
+            let playerArr3 = [];
+            let max = 0;
+            playerArr3 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr3);
+            return `Player ${tiePlayers[playerArr3.indexOf(max)].i + 1}`;
+        default:
+            break;
+    }
+}
 
