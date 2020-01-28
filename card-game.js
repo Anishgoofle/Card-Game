@@ -93,6 +93,18 @@ function createDeck() {
     }
 }
 
+//Function for switching the values of two random cards
+function shuffle() {
+    let randCard;
+    let temp;
+    for (let index = deck.length - 1; index >= 0; index--) {
+        randCard = Math.floor(Math.random() * deck.length);
+        temp = deck[index];
+        deck[index] = deck[randCard];
+        deck[randCard] = temp;
+    }
+}
+
 
 //Function for creating players
 function createPlayers(num) {
@@ -103,3 +115,52 @@ function createPlayers(num) {
         players.push(player);
     }
 }
+
+//Function for alternate handing cards to each player
+function deal(numCards) {
+    for (let i = 0; i < numCards; i++) {
+        for (let x = 0; x < players.length; x++) {
+            let card = deck.pop();
+            players[x].hand.push(card);
+            updatePoints();
+        }
+    }
+}
+
+//Function for updating player score
+function updatePoints() {
+    for (let i = 0; i < players.length; i++) {
+        getPoints(i);
+    }
+}
+
+// Function that returns the number of points that a player has in hand
+function getPoints(player) {
+    let points = 0;
+    for (let i = 0; i < players[player].hand.length; i++) {
+        points += players[player].hand[i].weight;
+    }
+    players[player].points = points;
+    return points;
+}
+
+/*
+ Function called to determine the winner
+ The check function reduces the global players variable 
+ to contain only the player name and the hand array(array storing the card info)
+ These are the useful info we require to determine the winner
+ The detectWinner function is called with the reduced array passed as a parameter
+*/
+function check() {
+    let result = players.reduce((res, arr) => {
+        res.push({
+            name: arr.name,
+            hand: arr.hand
+        });
+        return res;
+    }, []);
+    detectWinner(result);
+}
+
+
+
