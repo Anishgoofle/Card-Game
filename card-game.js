@@ -44,7 +44,11 @@ let cards = 0;
 
 
 r1.question('Enter the number of players: ', numPlayers => {
-    r1.question('Enter the number of cards to be distributed to each Player: ', numCards => {
+    if (numPlayers <= 1) {
+        console.log(`You need minimum 2 players to start the game !!!`);
+        process.exit(0);
+    }
+    r1.question('Enter the number of cards to be distributed to each player: ', numCards => {
         startGame(numPlayers, Number(numCards));
         if (winner) r1.close(console.log('Thanks for Playing'));
     });
@@ -412,19 +416,21 @@ victory conditions are satisfied but the number of
 players satisfying the condition is greater than 1
 */
 function checkTieWinner(tiePlayers, condition) {
+    let playerArr1 = [];
+    let max = 0;
     switch (condition) {
         case 'allEqual':
-            let playerArr1 = [];
-            break;
+            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr1);
+            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
         case 'sequence':
-            let playerArr2 = [];
-            break;
+            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr1);
+            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
         case 'pair':
-            let playerArr3 = [];
-            let max = 0;
-            playerArr3 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
-            max = Math.max(...playerArr3);
-            return `Player ${tiePlayers[playerArr3.indexOf(max)].i + 1}`;
+            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr1);
+            return `Player ${tiePlayers[playerArr1.indexOf(max)].i + 1}`;
         default:
             break;
     }
