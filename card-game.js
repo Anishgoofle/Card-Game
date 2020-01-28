@@ -9,8 +9,6 @@ const r1 = readline.createInterface({
 
 
 console.log(`
-Drunk-Card-Game
-
 Welcome to the Drunk-Card-Game app! 
 Version: 1.0.0.
 
