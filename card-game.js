@@ -229,7 +229,7 @@ function checkEqual(item) {
         el.hand.map(val => {
             handArr.push(val);
             if (handArr.length === cards) {
-                if (_.differenceBy(handArr[0], handArr[1], handArr[2], 'value') === []) {
+                if (_.differenceBy(...handArr, 'value') === []) {
                     players.push({ name: el.name, i });
                     handArr = [];
                 }
