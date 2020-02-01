@@ -30,8 +30,8 @@ let cards = 0;
 
 function startGame(numPlayers, numCards) {
     cards = numCards;
-    let deck = createDeck();
-    shuffle(deck);
+    createDeck();
+    shuffle();
     createPlayers(numPlayers);
     deal(cards);
     check();

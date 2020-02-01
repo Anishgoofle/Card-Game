@@ -21,6 +21,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "mocha": "^7.0.1",
     "qunit": "^2.9.3"
   }
