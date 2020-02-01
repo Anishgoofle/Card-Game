@@ -30,8 +30,8 @@ let cards = 0;
 
 function startGame(numPlayers, numCards) {
     cards = numCards;
-    createDeck();
-    shuffle();
+    let deck = createDeck();
+    shuffle(deck);
     createPlayers(numPlayers);
     deal(cards);
     check();
@@ -59,6 +59,7 @@ function createDeck() {
             deck.push(card);
         }
     }
+    return deck;
 }
 
 
@@ -76,6 +77,7 @@ function shuffle() {
         deck[index] = deck[randCard];
         deck[randCard] = temp;
     }
+    return deck;
 }
 
 
@@ -91,6 +93,7 @@ function createPlayers(num) {
         let player = { name: 'Player ' + i, id: i, points: 0, hand: hand };
         players.push(player);
     }
+    return players;
 }
 
 /** 
@@ -106,6 +109,7 @@ function deal(numCards) {
             updatePoints();
         }
     }
+    return players;
 }
 
 //Function for updating player score
@@ -435,7 +439,10 @@ function checkTieWinner(tiePlayers, condition) {
 module.exports = {
     winner,
     startGame,
-    createDeck
+    createDeck,
+    shuffle,
+    createPlayers,
+    deal
 };
 
 

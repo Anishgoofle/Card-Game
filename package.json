@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha card-game-test.js"
+    "test": "mocha test/card-game-test.js"
   },
   "repository": {
     "type": "git",
