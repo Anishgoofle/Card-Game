@@ -5,5 +5,9 @@ A simple luck based card-game
 ```
 git clone https://github.com/Anishgoofle/Card-Game
 npm install
-node card-game.js
+node main.js
+```
+## Testing
+```
+npm test
 ```

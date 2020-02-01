@@ -1,28 +1,4 @@
-const readline = require('readline');
 const _ = require('lodash');
-
-
-const r1 = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-
-console.log(`
-Welcome to the Drunk-Card-Game app! 
-Version: 1.0.0.
-
-Usage: 
-1.Basic card game where in the cards are shuffled and dealt between players (min - 2)
-2.Each player is assigned shuffled cards
-3.Winner is decided based on the order of achievement of the following:
--All the card are same(have same rank value, 'A' or 'Ace' being the top one)
--Next is the sequence in order(ex 4, 5, 6)
--Next is to check pair (ex two 'K' or two 'Q')
--If all else fails ,the card having the top value wins!
-`);
-
-
 
 /*
  Global vars
@@ -41,28 +17,15 @@ let winner = '';
 let cards = 0;
 
 
-r1.question('Enter the number of players: ', numPlayers => {
-    if (numPlayers <= 1) {
-        console.log(`You need minimum 2 players to start the game !!!`);
-        process.exit(0);
-    }
-    r1.question('Enter the number of cards to be distributed to each player: ', numCards => {
-        startGame(numPlayers, Number(numCards));
-        if (winner) r1.close(console.log('Thanks for Playing'));
-    });
-});
-
-
-/*
- Function for starting game
- -The first process consists of creating deck
- -The cards are randomly shuffled
- -Players are created
- -The shuffled cards are dealt between the players
- -The check function is called to determine the winner
-  Input variables:-
-    -numPlayers - user input for number of players
-    -numCards - user input for number of cards to be distributed to each player
+/**
+ * Function for starting game
+ * The first process consists of creating deck
+ * The cards are randomly shuffled
+ * Players are created
+ * The shuffled cards are dealt between the players
+ * The check function is called to determine the winner
+ * @param {string} numPlayers - user input for number of players
+ * @param {number} numCards - user input for number of cards to be distributed to each player
 */
 
 function startGame(numPlayers, numCards) {
@@ -75,7 +38,10 @@ function startGame(numPlayers, numCards) {
 }
 
 
-//Function for creating deck
+/**
+ * Function for creating deck
+ * @returns deck of cards
+ */
 function createDeck() {
     deck = [];
     for (let i = 0; i < values.length; i++) {
@@ -95,7 +61,12 @@ function createDeck() {
     }
 }
 
-//Function for switching the values of two random cards
+
+/**
+ * Function for switching the values of two random cards
+ * @returns shuffled deck of cards
+ */
+
 function shuffle() {
     let randCard;
     let temp;
@@ -108,7 +79,11 @@ function shuffle() {
 }
 
 
-//Function for creating players
+/**
+ * Function for creating players
+ * @param {number} num - number of players to be created
+ */
+
 function createPlayers(num) {
     players = [];
     for (let i = 1; i <= num; i++) {
@@ -118,7 +93,11 @@ function createPlayers(num) {
     }
 }
 
-//Function for alternate handing cards to each player
+/** 
+ * Function for alternate handing cards to each player
+ * @param {number} numCards - number of cards to be distributed to each player
+ */
+
 function deal(numCards) {
     for (let i = 0; i < numCards; i++) {
         for (let x = 0; x < players.length; x++) {
@@ -136,7 +115,12 @@ function updatePoints() {
     }
 }
 
-// Function that returns the number of points that a player has in hand
+/** 
+ * Function that returns the number of points that a player has in hand
+ * @param {number} player - the player number from the players array
+ * @return update points for the player
+ */
+
 function getPoints(player) {
     let points = 0;
     for (let i = 0; i < players[player].hand.length; i++) {
@@ -146,13 +130,13 @@ function getPoints(player) {
     return points;
 }
 
-/*
- Function called to determine the winner
- The check function reduces the global players variable 
- to contain only the player name and the hand array(array storing the card info)
- These are the useful info we require to determine the winner
- The detectWinner function is called with the reduced array passed as a parameter
-*/
+/**
+ * Function called to determine the winner
+ * The check function reduces the global players variable to contain only the player name and the hand array(array storing the card info)
+ * These are the useful info we require to determine the winner
+ * The detectWinner function is called with the reduced array passed as a parameter
+ */
+
 function check() {
     let result = players.reduce((res, arr) => {
         res.push({
@@ -165,18 +149,16 @@ function check() {
 }
 
 
-/*
- detectWinner()
- -This function takes the reduced array and sort the array(hand)
-  containing the cards based on their rank values ('weights' key in array) in descending
-  order.
--The sorted array is then passed through the following conditions:-
- -First victory condition - 'checkEqual()' - to check all cards are same (ex - 3A's for a player having three cards)
- -Second victory condition - 'checkSequence()' - to check if card are in sequence ..(ex 4, 5, 6)
- -Third victory condition - 'checkPair()' - to check if the cards contain a pair.. (ex 2'K' or 2'A')
- -Fourth victory conditon - 'checkTopCard()' - if above all 3 conditions fail, then the winnner is determined
-   by taking the top card (by rank(weight)) and checking which player has the highest card by rank value.
-   ***In case of  a tie, the tied players are then allowed to pick a new card from the deck until a winner is found***
+/**
+ * This function takes the reduced array and sort the array(hand) containing the cards based on their rank values ('weights' key in array) in descending order.
+ * The sorted array is then passed through the following conditions:-
+ * First victory condition - 'checkEqual()' - to check all cards are same (ex - 3A's for a player having three cards)
+ * Second victory condition - 'checkSequence()' - to check if card are in sequence ..(ex 4, 5, 6)
+ * Third victory condition - 'checkPair()' - to check if the cards contain a pair.. (ex 2'K' or 2'A')
+ * Fourth victory conditon - 'checkTopCard()' - if above all 3 conditions fail, then the winnner is determined by taking the top card (by rank(weight)) and checking which player has the highest card by rank value.
+ * In case of  a tie, the tied players are then allowed to pick a new card from the deck until a winner is found
+ * @param {array} item - reduced array containg player name and his cards object
+ * @returns the winning player
 */
 
 function detectWinner(item) {
@@ -214,14 +196,16 @@ function detectWinner(item) {
     }
 }
 
-/*
-  First victory condition function
-  -The array is passed to check if one of the players have all
-   the cards with same rank value.The player found is the winner
-   If there are more than one player found with the victory condition
-   then checkTieWinner() is called with condition passed as
-   "allEqual" otherwise the function returns the player name who wins the game.
-*/
+/**
+ * First victory condition function
+ * The array is passed to check if one of the players have all the cards with same rank value.
+ * The player found is the winner
+ * If there are more than one player found with the victory condition then checkTieWinner() is called with condition passed as
+ * "allEqual" otherwise the function returns the player name who wins the game.
+ * @param {array} item - sorted and reduced array according to rank
+ * @returns the winner player to main function else tie checker
+ */
+
 function checkEqual(item) {
     let handArr = [];
     let players = [];
@@ -243,15 +227,16 @@ function checkEqual(item) {
     if (players.length > 0) return players[0].name;
 }
 
-//If first fails
-/*
-  Second victory condition function
-  -The array is passed to check if one of the players have
-   the cards with their value in sequence.(for ex a player with 3 cards have card sequence as 4, 5, 6)
-   The player found is the winner If there are more than one player found with the victory condition
-   then checkTieWinner() is called with condition passed as
-   "sequence" otherwise the function returns the player name who wins the game.
-*/
+/**
+ * If first victory condition fails, then this is triggered.
+ * The array is passed to check if one of the players have the cards with their value in sequence.(for ex a player with 3 cards have card sequence as 4, 5, 6)
+ * The player found is the winner 
+ * If there are more than one player found with the victory condition  then checkTieWinner() is called with condition passed as
+ * "sequence" otherwise the function returns the player name who wins the game.
+ * @param {array} item - sorted and reduced array according to rank
+ * @returns the winner player to main function else tie checker
+ */
+
 function checkSequence(item) {
     let weightArr = [];
     let players = [];
@@ -271,15 +256,16 @@ function checkSequence(item) {
     if (players.length > 0) return players[0].name;
 }
 
-//If second fails
-/*
-  Third victory condition function
-  -The array is passed to check if one of the players have
-   two similar cards (for ex two 'K' or 'A').The player found is the winner
-   If there are more than one player found with the victory condition
-   then checkTieWinner() is called with condition passed as
-   "pair" otherwise the function returns the player name who wins the game.
-*/
+/**
+ * If second victory condition fails, then this is triggered.
+ * The array is passed to check if one of the players have two similar cards (for ex two 'K' or 'A').
+ * The player found is the winner
+ * If there are more than one player found with the victory condition then checkTieWinner() is called with condition passed as
+ * "pair" otherwise the function returns the player name who wins the game.
+ * @param {array} item - sorted and reduced array according to rank
+ * @returns the winner player to main function else tie checker
+ */
+
 function checkPair(item) {
     let pairArr = [];
     let players = [];
@@ -297,25 +283,24 @@ function checkPair(item) {
     if (players.length > 0) return players[0].name;
 }
 
-//If all condition fail
-/*
-  Fourth victory condition function
-  -The array is passed to check the top card of each player.
-   The player with a top and unique card found is the winner
-   If there are more than one player found with the victory condition
-   then checkTopCardTie() is called with tied players and top card 
-   values passes as params
-   for ex if there are 4 players with 3 cards each
-   Player 1 - 'A', '2' ,'3'
-   Player 2 - 'K', '1' ,'10'
-   Player 3 - 'A', '5' ,'0'
-   Player 4 - 'Q', '7' ,'9'
-   we can see that top cards for each player is A, K, A, Q
-   but in this case we also see a tie between two players - 1 & 3
-   so checkTopCardTie is called to break the tie
-   ***if the case was A, K, K, Q - although the array contains tie but
-   the winner is the player having card 'A'***
-   Array duplicacy is checked with the help of checkIfUniqueArr()
+
+/**
+ * Fourth victory condition function
+ * The array is passed to check the top card of each player.
+ * The player with a top and unique card found is the winner
+ * If there are more than one player found with the victory condition
+ * then checkTopCardTie() is called with tied players and top card values passes as params
+ * for ex if there are 4 players with 3 cards each
+ * Player 1 - 'A', '2' ,'3'
+ * Player 2 - 'K', '1' ,'10'
+ * Player 3 - 'A', '5' ,'0'
+ * Player 4 - 'Q', '7' ,'9'
+ * we can see that top cards for each player is A, K, A, Q
+ * but in this case we also see a tie between two players - 1 & 3 so checkTopCardTie is called to break the tie
+ * if the case was A, K, K, Q - although the array contains tie but the winner is the player having card 'A'
+ * Array duplicacy is checked with the help of checkIfUniqueArr()
+ * @param {array} item - sorted and reduced array according to rank
+ * @returns the winner player index to main function else tie checker for top card
 */
 
 function checkTopCard(item) {
@@ -354,20 +339,27 @@ function checkTopCard(item) {
     }
 }
 
-//Function to check if array contains duplicates
+/**
+ * Function to check if array contains duplicates
+ * @param {array} arr
+ * @returns boolean value
+ */
+
 function checkIfUniqueArr(arr) {
     return arr.length === new Set(arr).size;
 }
 
-/*
- checkTopCardTie()
- -This function checks for the tie breaker between the players
- for ex if 4 players have top cards of 'A','A','K','K'
- then there is also a tie breaker and also we have the max or the top rank
- value card for the tie breaker, in this case 'A','A' will go for the tie 
- breaker and then the rest of the game will follow.
- The functions handles all these corner cases
-*/
+/**
+ * This function checks for the tie breaker between the players
+ * for ex if 4 players have top cards of 'A','A','K','K'
+ * then there is also a tie breaker and also we have the max or the top rank
+ * value card for the tie breaker, in this case 'A','A' will go for the tie
+ * breaker and then the rest of the game will follow.
+ * The functions handles all these corner cases.
+ * @param {array} arr containing the top card for each of the players
+ * @returns the result for tie breaker
+ */
+
 function checkTopCardTie(arr) {
     let tieCards = [];
     let max = 0;
@@ -377,14 +369,15 @@ function checkTopCardTie(arr) {
     return dealTie(arr);
 }
 
-/*
- dealTie()
- -After all the cases for players have been checked and the tied players are 
- sorted and filtered according the criteria , then this function is called in
- the end to determine the winner.
- Each tied player has to start a new game with  a new card given to him
- The game goes on until a top card is found
-*/
+/**
+ * After all the cases for players have been checked and the tied players are sorted and filtered according to the criteria. 
+ * function is called in the end to determine the winner.
+ * Each tied player has to start a new game with  a new card given to him
+ * The game goes on until a top card is found
+ * @param {array} arr - array of players containing the top value card
+ * @returns the winner player index
+ */
+
 function dealTie(arr) {
     let tiePlayers = [];
     let max = 0;
@@ -438,4 +431,11 @@ function checkTieWinner(tiePlayers, condition) {
             break;
     }
 }
+
+module.exports = {
+    winner,
+    startGame,
+    createDeck
+};
+
 
