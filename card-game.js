@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 /**
  * Global vars
  * @var suits - contains the types for cards
@@ -152,7 +150,7 @@ function check() {
         });
         return res;
     }, []);
-    let winner = detectWinner(result);
+    let winner = detectWinner(result, cards);
     console.log(`Winner is ${winner[0]} -- ${winner[1]}`);
 }
 
@@ -218,7 +216,7 @@ function checkEqual(item, cards) {
         el.hand.map(val => {
             handArr.push(val);
             if (handArr.length == cards) {
-                if (_.differenceBy(...handArr, 'value') === []) {
+                if (handArr.every(val => val.value == handArr[0].value)) {
                     players.push({ name: el.name, i });
                     handArr = [];
                 }
@@ -228,7 +226,7 @@ function checkEqual(item, cards) {
             }
         });
     });
-    if (players.length > 1) return checkTieWinner(players, 'allEqual');
+    if (players.length > 1) return checkTieWinner(players, 'allEqual', item);
     if (players.length > 0) return players[0].name;
 }
 
@@ -249,8 +247,8 @@ function checkSequence(item, cards) {
         el.hand.map(val => {
             weightArr.push(val.weight);
             if (weightArr.length == cards) {
-                const diffArr = weightArr.slice(1).map((n, i) => weightArr[i] - n);
-                Math.abs(diffArr);
+                let diffArr = weightArr.slice(1).map((n, i) => weightArr[i] - n);
+                diffArr = diffArr.map(v => Math.abs(v));
                 const isDiff = diffArr.every(val => val == 1);
                 if (isDiff) players.push({ name: el.name, i });
                 weightArr = [];
@@ -415,27 +413,27 @@ function dealTie(arr) {
  * @returns the winner player name
  */
 
-function checkTieWinner(tiePlayers, condition) {
-    let playerArr1 = [];
+function checkTieWinner(tiePlayers, condition, arr) {
+    let playerArr = [];
     let max = 0;
     let pairValue = [];
     var map = new Map();
     switch (condition) {
         case 'allEqual':
-            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
-            max = Math.max(...playerArr1);
-            return tiePlayers[playerArr1.indexOf(max)].name;
+            playerArr = arr.map(val => val.hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr);
+            return tiePlayers[playerArr.indexOf(max)].name;
         case 'sequence':
-            playerArr1 = tiePlayers.map(player => players[player.i].hand.reduce((a, b) => a + b.weight, 0));
-            max = Math.max(...playerArr1);
-            return tiePlayers[playerArr1.indexOf(max)].name;
+            playerArr = arr.map(val => val.hand.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr);
+            return tiePlayers[playerArr.indexOf(max)].name;
         case 'pair':
-            pairValue = tiePlayers.map(player => players[player.i].hand);
+            pairValue = arr.map(val => val.hand);
             pairValue.forEach(val => val.forEach(el => map.set(el.weight, (map.get(el.weight) || 0) + 1)));
             pairValue = pairValue.map(val => val.filter(el => map.get(el.weight) > 1));
-            playerArr1 = pairValue.map(val => val.reduce((a, b) => a + b.weight, 0));
-            max = Math.max(...playerArr1);
-            return tiePlayers[playerArr1.indexOf(max)].name;
+            playerArr = pairValue.map(val => val.reduce((a, b) => a + b.weight, 0));
+            max = Math.max(...playerArr);
+            return tiePlayers[playerArr.indexOf(max)].name;
         default:
             break;
     }
@@ -449,7 +447,13 @@ module.exports = {
     createPlayers,
     deal,
     checkIfUniqueArr,
-    detectWinner
+    detectWinner,
+    checkEqual,
+    checkSequence,
+    checkPair,
+    checkTopCard,
+    dealTie,
+    checkTieWinner
 };
 
 
