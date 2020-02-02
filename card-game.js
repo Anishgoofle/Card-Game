@@ -166,33 +166,34 @@ function check() {
  * Fourth victory conditon - @function checkTopCard- if above all 3 conditions fail, then the winnner is determined by taking the top card (by rank(weight)) and checking which player has the highest card by rank value.
  * In case of  a tie, the tied players are then allowed to pick a new card from the deck until a winner is found
  * @param {array} item - reduced array containg player name and his cards object
+ * @param {number} cards - number of cards
  * @returns the winning player
 */
 
-function detectWinner(item) {
+function detectWinner(item, cards) {
     //Sort each value rankwise
     item.map(val => val.hand.sort((a, b) => (a.weight < b.weight) ? 1 : (b.weight < a.weight) ? -1 : 0));
-    let vCondition1 = checkEqual(item);
+    let vCondition1 = checkEqual(item, cards);
     if (vCondition1 !== undefined) {
         winner = vCondition1;
         return [winner, 'All Cards Same'];
     }
     if (!winner) {
-        let vCondition2 = checkSequence(item);
+        let vCondition2 = checkSequence(item, cards);
         if (vCondition2 !== undefined) {
             winner = vCondition2;
             return [winner, 'Card Sequence In Order'];
         }
     }
     if (!winner) {
-        let vCondition3 = checkPair(item);
+        let vCondition3 = checkPair(item, cards);
         if (vCondition3 !== undefined) {
             winner = vCondition3;
             return [winner, 'Card Pair Found'];
         }
     }
     if (!winner) {
-        let vCondition4 = checkTopCard(item);
+        let vCondition4 = checkTopCard(item, cards);
         if (vCondition4 !== undefined) {
             winner = ` Player ${vCondition4 + 1}`;
             return [winner, 'All Cases Failed, Player won by topcard rank value'];
@@ -206,16 +207,17 @@ function detectWinner(item) {
  * The player found is the winner
  * If there are more than one player found with the victory condition then @function checkTieWinner is called with condition passed as @param allEqual otherwise the function returns the player name who wins the game.
  * @param {array} item - sorted and reduced array according to rank
+ * @param {number} cards - number of cards
  * @returns the winner player to main function else tie checker
  */
 
-function checkEqual(item) {
+function checkEqual(item, cards) {
     let handArr = [];
     let players = [];
     item.map((el, i) => {
         el.hand.map(val => {
             handArr.push(val);
-            if (handArr.length === cards) {
+            if (handArr.length == cards) {
                 if (_.differenceBy(...handArr, 'value') === []) {
                     players.push({ name: el.name, i });
                     handArr = [];
@@ -236,16 +238,17 @@ function checkEqual(item) {
  * The player found is the winner 
  * If there are more than one player found with the victory condition  then @function checkTieWinner is called with condition passed as @param sequence otherwise the function returns the player name who wins the game.
  * @param {array} item - sorted and reduced array according to rank
+ * @param {number} cards - number of cards
  * @returns the winner player to main function else tie checker
  */
 
-function checkSequence(item) {
+function checkSequence(item, cards) {
     let weightArr = [];
     let players = [];
     item.map((el, i) => {
         el.hand.map(val => {
             weightArr.push(val.weight);
-            if (weightArr.length === cards) {
+            if (weightArr.length == cards) {
                 const diffArr = weightArr.slice(1).map((n, i) => weightArr[i] - n);
                 Math.abs(diffArr);
                 const isDiff = diffArr.every(val => val == 1);
@@ -264,16 +267,17 @@ function checkSequence(item) {
  * The player found is the winner
  * If there are more than one player found with the victory condition then @function checkTieWinner is called with condition passed as @param pair otherwise the function returns the player name who wins the game.
  * @param {array} item - sorted and reduced array according to rank
+ * @param {number} cards - number of cards
  * @returns the winner player to main function else tie checker
  */
 
-function checkPair(item) {
+function checkPair(item, cards) {
     let pairArr = [];
     let players = [];
     item.map((el, i) => {
         el.hand.map(val => {
             pairArr.push(val.value);
-            if (pairArr.length === cards) {
+            if (pairArr.length == cards) {
                 const unique = checkIfUniqueArr(pairArr);
                 if (!unique) players.push({ name: el.name, i });
                 pairArr = [];
@@ -301,10 +305,11 @@ function checkPair(item) {
  * if the case was A, K, K, Q - although the array contains tie but the winner is the player having card 'A'
  * Array duplicacy is checked with the help of @function checkIfUniqueArr
  * @param {array} item - sorted and reduced array according to rank
+ * @param {number} cards - number of cards
  * @returns the winner player index to main function else tie checker for top card
 */
 
-function checkTopCard(item) {
+function checkTopCard(item, cards) {
     let topCardArr = [];
     let values = [];
     let max = 0;

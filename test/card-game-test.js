@@ -3,6 +3,8 @@ const game = require('../card-game.js');
 const expect = require('chai').expect;
 
 const deck = game.createDeck();
+const numPlayers = 4;
+const numCards = 3;
 let globalPlayersArr = [];
 
 describe('createDeck', () => {
@@ -25,7 +27,6 @@ describe('shuffle', () => {
 
 describe('createPlayers', () => {
     it('creates the set of players', () => {
-        const numPlayers = 4;
         const players = game.createPlayers(numPlayers);
         globalPlayersArr = players;
         assert.equal(players.length, numPlayers);
@@ -35,7 +36,6 @@ describe('createPlayers', () => {
 
 describe('deal', () => {
     it('deals the shuffled cards between players', () => {
-        const numCards = 3;
         const players = game.deal(numCards);
         assert.equal(players[0].hand.length, numCards);
         expect(players[0].hand).to.have.lengthOf(numCards);
@@ -67,7 +67,7 @@ describe('detectWinner', () => {
             });
             return res;
         }, []);
-        game.winner = game.detectWinner(result);
+        game.winner = game.detectWinner(result, numCards);
         expect(game.winner).to.be.an('array');
         expect(game.winner).to.have.lengthOf(2);
     });
