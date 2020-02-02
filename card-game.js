@@ -152,7 +152,8 @@ function check() {
         });
         return res;
     }, []);
-    detectWinner(result);
+    let winner = detectWinner(result);
+    console.log(`Winner is ${winner[0]} -- ${winner[1]}`);
 }
 
 
@@ -174,31 +175,27 @@ function detectWinner(item) {
     let vCondition1 = checkEqual(item);
     if (vCondition1 !== undefined) {
         winner = vCondition1;
-        console.log(`Winner is ${winner} --> All Cards Same`);
-        return;
+        return [winner, 'All Cards Same'];
     }
     if (!winner) {
         let vCondition2 = checkSequence(item);
         if (vCondition2 !== undefined) {
             winner = vCondition2;
-            console.log(`Winner is ${winner} --> Card Sequence In Order`);
-            return;
+            return [winner, 'Card Sequence In Order'];
         }
     }
     if (!winner) {
         let vCondition3 = checkPair(item);
         if (vCondition3 !== undefined) {
             winner = vCondition3;
-            console.log(`Winner is ${winner} --> Pair Check`);
-            return;
+            return [winner, 'Card Pair Found'];
         }
     }
     if (!winner) {
         let vCondition4 = checkTopCard(item);
         if (vCondition4 !== undefined) {
             winner = ` Player ${vCondition4 + 1}`;
-            console.log(`Winner is ${winner} --> All Cases Failed, Won By Topcard Rank Value`);
-            return;
+            return [winner, 'All Cases Failed, Player won by topcard rank value'];
         }
     }
 }
@@ -316,7 +313,7 @@ function checkTopCard(item) {
         el.hand.map(val => {
             max = Math.max(max, val.weight);
             count++;
-            if (count === cards) {
+            if (count == cards) {
                 topCardArr.push({ max, i });
                 count = 0;
                 max = 0;
@@ -409,7 +406,7 @@ function dealTie(arr) {
  * This function is triggered when any of the first 3 victory conditions are satisfied 
  * but the number of players satisfying the condition is greater than 1
  * @param {array} tiePlayers - number of players satisfying the victory condition
- * @param {string} condition - the string passes in all three cases @param allEqual, @param sequence or @param pair
+ * @param {string} condition - the string passed in all three cases @param allEqual, @param sequence or @param pair
  * @returns the winner player name
  */
 
@@ -446,7 +443,8 @@ module.exports = {
     shuffle,
     createPlayers,
     deal,
-    checkIfUniqueArr
+    checkIfUniqueArr,
+    detectWinner
 };
 
 
