@@ -29,8 +29,13 @@ r1.question('Enter the number of players: ', numPlayers => {
         process.exit(0);
     }
     r1.question('Enter the number of cards to be distributed to each player: ', numCards => {
-        game.startGame(numPlayers, Number(numCards));
-        r1.close();
-        if (game.winner) process.exit(0);
+        if (numCards <= 1) {
+            console.log(`You need minimum 2 cards to start the game !!!`);
+            process.exit(0);
+        } else {
+            game.startGame(numPlayers, Number(numCards));
+            r1.close();
+            if (game.winner) process.exit(0);
+        }
     });
 });

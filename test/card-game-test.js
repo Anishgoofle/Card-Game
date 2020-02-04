@@ -137,8 +137,24 @@ describe('dealTie', () => {
         //max key is the weight or the rank of the top card
         //i determines the index of the player having the top card
         //here max = 14 means the two tied players had the top card as 'A'
-        const arr = [{ max: 14, i: 1 }, { max: 14, i: 2 }];
-        const index = game.dealTie(arr);
+        const deck = game.shuffle();
+        const players = [{
+            name: 'Player 1',
+            id: 1,
+            points: 33,
+            hand: [{ value: 'A', suit: 'Spades', weight: 14 },
+            { value: '10', suit: 'Diamonds', weight: 10 },
+            { value: '9', suit: 'Hearts', weight: 9 }]
+        }, {
+            name: 'Player 2',
+            id: 1,
+            points: 29,
+            hand: [{ value: 'A', suit: 'Spades', weight: 14 },
+            { value: '2', suit: 'Diamonds', weight: 2 },
+            { value: 'K', suit: 'Hearts', weight: 13 }]
+        }];
+        const arr = [{ max: 14, i: 0 }, { max: 14, i: 1 }];
+        const index = game.dealTie(arr, deck, players);
         expect(index).to.be.a('number');
     });
 });
@@ -158,7 +174,7 @@ describe('checkTieWinner', () => {
                 { value: 'K', suit: 'Hearts', weight: 13 }]
             }];
             const players = [{ name: 'Player 1', i: 0 }, { name: 'Player 2', i: 1 }];
-            const name = game.checkTieWinner(players, 'allEqual', arr);
+            const name = game.checkTieWinner(players, 'allEqual', arr, numCards);
             expect(name).to.be.a('string').and.equal('Player 1');
         });
     });
@@ -177,7 +193,7 @@ describe('checkTieWinner', () => {
                 { value: '4', suit: 'Hearts', weight: 4 }]
             }];
             const players = [{ name: 'Player 1', i: 0 }, { name: 'Player 2', i: 1 }];
-            const name = game.checkTieWinner(players, 'sequence', arr);
+            const name = game.checkTieWinner(players, 'sequence', arr, numCards);
             expect(name).to.be.a('string').and.equal('Player 1');
         });
     });
@@ -196,7 +212,7 @@ describe('checkTieWinner', () => {
                 { value: '2', suit: 'Hearts', weight: 2 }]
             }];
             const players = [{ name: 'Player 1', i: 0 }, { name: 'Player 2', i: 1 }];
-            const name = game.checkTieWinner(players, 'pair', arr);
+            const name = game.checkTieWinner(players, 'pair', arr, numCards);
             expect(name).to.be.a('string').and.equal('Player 2');
         });
     });

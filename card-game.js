@@ -107,26 +107,31 @@ function deal(numCards) {
         for (let x = 0; x < players.length; x++) {
             let card = deck.pop();
             players[x].hand.push(card);
-            updatePoints();
+            updatePoints(players);
         }
     }
     return players;
 }
 
-//Function for updating player score
-function updatePoints() {
+/**
+ * Function for updating player score
+ * @param {array} players - array of players
+ * @returns callback of @function getPoints
+*/
+function updatePoints(players) {
     for (let i = 0; i < players.length; i++) {
-        getPoints(i);
+        getPoints(i, players);
     }
 }
 
 /** 
  * Function that returns the number of points that a player has in hand
  * @param {number} player - the player number from the players array
+ * @param {array} players - array of players
  * @returns update points for the player
  */
 
-function getPoints(player) {
+function getPoints(player, players) {
     let points = 0;
     for (let i = 0; i < players[player].hand.length; i++) {
         points += players[player].hand[i].weight;
@@ -226,7 +231,7 @@ function checkEqual(item, cards) {
             }
         });
     });
-    if (players.length > 1) return checkTieWinner(players, 'allEqual', item);
+    if (players.length > 1) return checkTieWinner(players, 'allEqual', item, cards);
     if (players.length > 0) return players[0].name;
 }
 
@@ -255,7 +260,7 @@ function checkSequence(item, cards) {
             }
         });
     });
-    if (players.length > 1) return checkTieWinner(players, 'sequence');
+    if (players.length > 1) return checkTieWinner(players, 'sequence', item, cards);
     if (players.length > 0) return players[0].name;
 }
 
@@ -282,7 +287,7 @@ function checkPair(item, cards) {
             }
         });
     });
-    if (players.length > 1) return checkTieWinner(players, 'pair');
+    if (players.length > 1) return checkTieWinner(players, 'pair', item, cards);
     if (players.length > 0) return players[0].name;
 }
 
@@ -334,7 +339,7 @@ function checkTopCard(item, cards) {
             return values.indexOf(max);
         }
         else {
-            return checkTopCardTie(topCardArr);
+            return checkTopCardTie(topCardArr, deck, players);
         }
     } else {
         topCardArr.map(el => values.push(el.max));
@@ -361,16 +366,18 @@ function checkIfUniqueArr(arr) {
  * breaker and then the rest of the game will follow.
  * The functions handles all these corner cases.
  * @param {array} arr containing the top card for each of the players
+ * @param {array} deck - the shuffled deck
+ * @param {array} players - array of players
  * @returns the result for tie breaker
  */
 
-function checkTopCardTie(arr) {
+function checkTopCardTie(arr, deck, players) {
     let tieCards = [];
     let max = 0;
     arr.map(el => tieCards.push(el.max));
     max = Math.max(...tieCards);
     arr = arr.filter(val => val.max == max);
-    return dealTie(arr);
+    return dealTie(arr, deck, players);
 }
 
 /**
@@ -379,25 +386,28 @@ function checkTopCardTie(arr) {
  * Each tied player has to start a new game with  a new card given to him
  * The game goes on until a top card is found
  * @param {array} arr - array of players containing the top value card
+ * @param {array} deck - the shuffled deck
+ * @param {array} players - array containing players info
  * @returns the winner player index
  */
 
-function dealTie(arr) {
+function dealTie(arr, deck, players) {
     let tiePlayers = [];
     let max = 0;
     while (true) {
-        let tieWeight = [];
+        let tiedPoints = [];
         for (let x = 0; x < arr.length; x++) {
             let card = deck.pop();
             tiePlayers.push(players[arr[x].i]);
             tiePlayers[x].hand = [];
             tiePlayers[x].hand.push(card);
+            updatePoints(tiePlayers);
         }
-        tiePlayers.map(val => val.hand.map(el => tieWeight.push(el.weight)));
-        const unique = checkIfUniqueArr(tieWeight);
+        tiePlayers.map(el => tiedPoints.push(el.points));
+        const unique = checkIfUniqueArr(tiedPoints);
         if (unique) {
-            max = Math.max(...tieWeight);
-            return tieWeight.indexOf(max);
+            max = Math.max(...tiedPoints);
+            return tiedPoints.indexOf(max);
         }
         else {
             continue;
@@ -410,30 +420,51 @@ function dealTie(arr) {
  * but the number of players satisfying the condition is greater than 1
  * @param {array} tiePlayers - number of players satisfying the victory condition
  * @param {string} condition - the string passed in all three cases @param allEqual, @param sequence or @param pair
+ * @param {array} arr - the reduced array 
+ * @param {number} cards - number of cards for each player
  * @returns the winner player name
  */
 
-function checkTieWinner(tiePlayers, condition, arr) {
-    let playerArr = [];
+function checkTieWinner(tiePlayers, condition, arr, cards) {
     let max = 0;
     let pairValue = [];
-    var map = new Map();
+    var map = {};
+    var filterObj = {};
+    var playerArr1 = {};
+    var tiedPoints = [];
     switch (condition) {
         case 'allEqual':
-            playerArr = arr.map(val => val.hand.reduce((a, b) => a + b.weight, 0));
+            playerArr = tiePlayers.map(player => arr[player.i].hand.reduce((a, b) => a + b.weight, 0));
             max = Math.max(...playerArr);
             return tiePlayers[playerArr.indexOf(max)].name;
         case 'sequence':
-            playerArr = arr.map(val => val.hand.reduce((a, b) => a + b.weight, 0));
+            playerArr = tiePlayers.map(player => arr[player.i].hand.reduce((a, b) => a + b.weight, 0));
             max = Math.max(...playerArr);
             return tiePlayers[playerArr.indexOf(max)].name;
         case 'pair':
-            pairValue = arr.map(val => val.hand);
-            pairValue.forEach(val => val.forEach(el => map.set(el.weight, (map.get(el.weight) || 0) + 1)));
-            pairValue = pairValue.map(val => val.filter(el => map.get(el.weight) > 1));
-            playerArr = pairValue.map(val => val.reduce((a, b) => a + b.weight, 0));
-            max = Math.max(...playerArr);
-            return tiePlayers[playerArr.indexOf(max)].name;
+            tiePlayers.map(player => {
+                arr[player.i].hand.map(el => {
+                    pairValue.push(el);
+                    if (pairValue.length === cards) {
+                        map = pairValue.reduce((obj, b) => {
+                            obj[b.value] = ++obj[b.value] || 1;
+                            return obj;
+                        }, {});
+                        filterObj = Object.keys(map).filter(val => map[val] == 2);
+                        pairValue = pairValue.filter(val => val.value == filterObj[0]);
+                        playerArr1 = pairValue.reduce((a, b) => a + b.weight, 0);
+                        tiedPoints.push(playerArr1);
+                        pairValue = [];
+                    }
+                });
+            });
+            if (!checkIfUniqueArr(tiedPoints)) {
+
+            } else {
+                max = Math.max(...tiedPoints);
+                return tiePlayers[tiedPoints.indexOf(max)].name;
+            }
+            break;
         default:
             break;
     }
