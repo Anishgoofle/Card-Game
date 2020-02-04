@@ -459,12 +459,14 @@ function checkTieWinner(tiePlayers, condition, arr, cards) {
                 });
             });
             if (!checkIfUniqueArr(tiedPoints)) {
-
+                let doubleTie = [];
+                doubleTie = tiePlayers.map(players => arr[players.i]);
+                let tieBreaker = checkTopCard(doubleTie, cards);
+                return doubleTie[tieBreaker].name;
             } else {
                 max = Math.max(...tiedPoints);
                 return tiePlayers[tiedPoints.indexOf(max)].name;
             }
-            break;
         default:
             break;
     }
